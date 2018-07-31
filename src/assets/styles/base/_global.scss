@@ -1,0 +1,16 @@
+body {
+  transition: opacity .5s;
+  font-size: 1.6rem;
+  // .js & {
+  //   opacity: 0;
+  // }
+
+  .wf-active & {
+    opacity: 1;
+  }
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}

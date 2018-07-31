@@ -1,0 +1,20 @@
+@font-face {
+  // font-family: 'title';
+  // src: url('../fonts/title.woff') format('woff'), /* Modern Browsers */
+  //      url('../fonts/title.ttf')  format('truetype'), /* Safari, Android, iOS */
+  //      url('../fonts/title.svg#38e255d333d4d3e22339f4d108bc6fa5') format('svg'); /* Legacy iOS */
+
+  // font-style:   normal;
+  // font-weight:  400;
+}
+
+html {
+  font-size: calc(1em * .625);
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.6rem;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}

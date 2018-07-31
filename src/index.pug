@@ -1,0 +1,38 @@
+doctype html
+html(lang="en" class="no-js")
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="x-ua-compatible" content="ie=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    title Title
+    script.
+      document.documentElement.classList.remove("no-js")
+      document.documentElement.classList.add("js")
+  body
+    include includes/vars.pug
+    include includes/mixins.pug
+
+    div#logo
+
+    script(id="vertexShader" type="x-shader/x-vertex").
+      void main() {
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    script(id="fragmentShader" type="x-shader/x-fragment").
+      #ifdef GL_ES
+      precision mediump float;
+      #endif
+
+      uniform vec2 u_resolution;
+      uniform float u_time;
+
+      vec3 colorA = vec3(0.404,0.227,0.717);
+      vec3 colorB = vec3(0.262,0.175,0.642);
+
+      void main() {
+        vec2 st = gl_FragCoord.xy/u_resolution.xy;
+        vec3 color = vec3(0.0);
+        vec3 pct = vec3(-cos(u_time)+1.0, 0.0, 0.0);
+        color = mix(colorA, colorB, pct);
+        gl_FragColor = vec4(color,1.0);
+      }
