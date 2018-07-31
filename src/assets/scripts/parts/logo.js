@@ -1,7 +1,6 @@
-'use strict';
-var THREE = require('three');
-var GLTFLoader = require('three-gltf-loader');
-var lerp = require('../helpers/lerp');
+const THREE = require('three');
+const GLTFLoader = require('three-gltf-loader');
+const lerp = require('../helpers/lerp');
 require('./../helpers/dracoloader');
 
 class Logo {
@@ -14,7 +13,7 @@ class Logo {
   }
 
   init() {
-    var loader = new GLTFLoader();
+    const loader = new GLTFLoader();
     THREE.DRACOLoader.setDecoderPath('../3d');
     THREE.DRACOLoader.setDecoderConfig({ type: 'js' });
     loader.setDRACOLoader(new THREE.DRACOLoader());
@@ -38,28 +37,27 @@ class Logo {
     this.spotlight.position.set(0, -1, 0);
     this.scene.add(this.spotlight);
 
-
     this.uniforms = {
-      resolution: { type: 'v2', value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      u_time: {type: 'f', value: 1.0}
+      u_resolution: { type: 'v2', value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_time: {type: 'f', value: 1.0},
+      u_mouse: { type: 'v2', value: new THREE.Vector2(this.dx, this.dy) },
     };
 
-    var material = new THREE.ShaderMaterial({
+    const material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader: document.getElementById('vertexShader').textContent,
       fragmentShader: document.getElementById('fragmentShader').textContent
     });
 
-    var geo = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight, 1, 1);
-    var plane = new THREE.Mesh(geo, material);
-    plane.position.z = -2;
+    const geo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+    const plane = new THREE.Mesh(geo, material);
+    plane.position.z = -2.0;
     this.scene.add(plane);
 
     loader.load(
       '../../assets/3d/NC.gltf',
-      gltf => {
+      (gltf) => {
         this.imported = gltf;
-        this.letters = this.imported.scene.children;
         this.scene.add(this.imported.scene);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -72,13 +70,17 @@ class Logo {
         window.addEventListener('resize', this.onWindowResize.bind(this));
         this.container.addEventListener('mousemove', this.onMouseMove.bind(this));
         this.render();
-      }
+      },
     );
   }
 
   onWindowResize() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.uniforms.u_resolution = {
+      type: 'v2',
+      value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+    };
     this.camera.updateProjectionMatrix();
   }
 
@@ -88,16 +90,18 @@ class Logo {
   }
 
   render() {
-    this.uniforms.u_time.value += 0.005;
+    this.uniforms.u_time.value += 0.05;
     this.dx = lerp(this.dx, this.sx, 0.1) || 0;
     this.dy = lerp(this.dy, this.sy, 0.1) || 0;
+    this.uniforms.u_mouse.value.x = this.dx / 1000;
+    this.uniforms.u_mouse.value.y = this.dy / 5000;
     this.camera.position.x = -this.dx / 10000;
     this.camera.position.y = this.dy / 5000;
-    this.imported.scene.rotation.x = (this.dy - window.innerHeight / 2) / 10000;
-    this.imported.scene.rotation.y = (this.dx - window.innerWidth / 2) / 100000;
+    this.imported.scene.rotation.x = (this.dy - (window.innerHeight / 2)) / 10000;
+    this.imported.scene.rotation.y = (this.dx - (window.innerWidth / 2)) / 100000;
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.render.bind(this));
   }
-};
+}
 
 module.exports = Logo;
