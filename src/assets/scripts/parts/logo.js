@@ -1,3 +1,4 @@
+/* eslint-env browser */
 const THREE = require('three');
 const GLTFLoader = require('three-gltf-loader');
 const lerp = require('../helpers/lerp');
@@ -9,22 +10,28 @@ class Logo {
     this.sy = 0;
     this.dx = 0;
     this.dy = 0;
+    this.wW = window.innerWidth;
+    this.wH = window.innerHeight;
     this.init();
   }
 
   init() {
-    const loader = new GLTFLoader();
-    THREE.DRACOLoader.setDecoderPath('../3d');
-    THREE.DRACOLoader.setDecoderConfig({ type: 'js' });
-    loader.setDRACOLoader(new THREE.DRACOLoader());
+    this.createScene();
+    this.createLights();
+    this.createShader();
+    this.loadLogo();
+  }
 
-    this.container = document.querySelector('#logo');
-    this.camera = new THREE.PerspectiveCamera(95, window.innerWidth / window.innerHeight, 0.1, 1000);
+  createScene() {
+    this.container = document.getElementById('logo');
+    this.camera = new THREE.PerspectiveCamera(95, this.wW / this.wH, 0.1, 1000);
     this.camera.position.set(0, 0.25, 3);
 
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.Fog(0x777777, 1, 4);
+  }
 
+  createLights() {
     this.ambientlight = new THREE.HemisphereLight(0xffffff, 0xffffff, 10);
     this.ambientlight.position.set(0, 0, 0);
     this.scene.add(this.ambientlight);
@@ -36,23 +43,32 @@ class Logo {
     this.spotlight.castShadow = false;
     this.spotlight.position.set(0, -1, 0);
     this.scene.add(this.spotlight);
+  }
 
+  createShader() {
     this.uniforms = {
-      u_resolution: { type: 'v2', value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      u_time: {type: 'f', value: 1.0},
+      u_resolution: { type: 'v2', value: new THREE.Vector2(this.wW, this.wH) },
+      u_time: { type: 'f', value: 1.0 },
       u_mouse: { type: 'v2', value: new THREE.Vector2(this.dx, this.dy) },
     };
 
     const material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader: document.getElementById('vertexShader').textContent,
-      fragmentShader: document.getElementById('fragmentShader').textContent
+      fragmentShader: document.getElementById('fragmentShader').textContent,
     });
 
-    const geo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+    const geo = new THREE.PlaneGeometry(this.wW, this.wH);
     const plane = new THREE.Mesh(geo, material);
-    plane.position.z = -2.0;
+    plane.position.z = -1.0;
     this.scene.add(plane);
+  }
+
+  loadLogo() {
+    const loader = new GLTFLoader();
+    THREE.DRACOLoader.setDecoderPath('../3d');
+    THREE.DRACOLoader.setDecoderConfig({ type: 'js' });
+    loader.setDRACOLoader(new THREE.DRACOLoader());
 
     loader.load(
       '../../assets/3d/NC.gltf',
@@ -61,7 +77,7 @@ class Logo {
         this.scene.add(this.imported.scene);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.wW, this.wH);
         this.renderer.gammaInput = true;
         this.renderer.gammaOutput = true;
         this.renderer.shadowMap.enabled = true;
@@ -75,11 +91,13 @@ class Logo {
   }
 
   onWindowResize() {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.wW = window.innerWidth;
+    this.wH = window.innerHeight;
+    this.renderer.setSize(this.wW, this.wH);
+    this.camera.aspect = this.wW / this.wH;
     this.uniforms.u_resolution = {
       type: 'v2',
-      value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      value: new THREE.Vector2(this.wW, this.wH),
     };
     this.camera.updateProjectionMatrix();
   }
@@ -97,10 +115,10 @@ class Logo {
     this.uniforms.u_mouse.value.y = this.dy / 5000;
     this.camera.position.x = -this.dx / 10000;
     this.camera.position.y = this.dy / 5000;
-    this.imported.scene.rotation.x = (this.dy - (window.innerHeight / 2)) / 10000;
-    this.imported.scene.rotation.y = (this.dx - (window.innerWidth / 2)) / 100000;
+    this.imported.scene.rotation.x = (this.dy - (this.wH / 2)) / 10000;
+    this.imported.scene.rotation.y = (this.dx - (this.wW / 2)) / 100000;
     this.renderer.render(this.scene, this.camera);
-    requestAnimationFrame(this.render.bind(this));
+    window.requestAnimationFrame(this.render.bind(this));
   }
 }
 

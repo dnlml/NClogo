@@ -7,7 +7,7 @@ const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 
 const extractCss = new ExtractTextPlugin({ filename: 'assets/styles/main.min.css', allChunks: true });
 const html = new HtmlWebpackPlugin({ filename: 'index.html', template: './src/index.pug', hash: true });
-const copyFiles = new CopyWebpackPlugin([{ from: 'src/assets/fonts', to: 'assets/fonts' }, { from: 'src/assets/3d', to: 'assets/3d' }, { from: 'src/assets/images', to: 'assets/images' }]);
+const copyFiles = new CopyWebpackPlugin([{ from: 'src/assets/3d', to: 'assets/3d' }]);
 const writeFiles = new WriteFilePlugin();
 const spriteLoader = new SpriteLoaderPlugin();
 
@@ -34,17 +34,6 @@ module.exports = {
       }, {
         test: /\.pug$/,
         use: [{ loader: 'raw-loader' }, { loader: 'pug-html-loader' }],
-      }, {
-        test: /\.svg$/,
-        loader: 'svg-sprite-loader',
-        include: path.resolve('./src/assets/svg/sprite'),
-        options: {
-          extract: true,
-          spriteFilename: './assets/svg/sprite.svg',
-        },
-      }, {
-        test: /\.(woff|woff2|eot|ttf)$/,
-        loader: 'url-loader?limit=100000'
       },
     ],
   },
