@@ -1,12 +1,12 @@
-# Webpack-boilerplate
-_A boilerplate made with webpack supporting ES6, Sass, pug_
+# NC Animation Demo
+_A Demo using threejs and shaders_
 
 ### Start
 use node v8.11.1
 
 `npm i`
 
-`npm run dev`
+`npm start`
 
 or
 
