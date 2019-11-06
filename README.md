@@ -2,7 +2,7 @@
 _A Demo using threejs and shaders_
 
 ### Demo
-[link](danielemeli.com/nc)
+[Link](http://www.danielemeli.com/nc)
 
 ### Start
 use node v8.11.1
